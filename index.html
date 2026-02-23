@@ -115,12 +115,10 @@ section{display:none;padding:40px;}
     font-weight:bold;
 }
 
-/* Status colors for black background */
 .pending{background:#fff;color:#000;}
 .completed{background:#00ff00;color:#000;}
 .cancelled{background:#ff0000;color:#fff;}
 
-/* PayPal button style */
 .paypal-btn{
     display:inline-block;
     margin-top:10px;
@@ -143,7 +141,6 @@ section{display:none;padding:40px;}
 
 <header>🔥 OTF Clan Market 🔥</header>
 
-<!-- LOGIN -->
 <div id="loginGate">
     <h2>Access Required</h2>
     <input id="username" placeholder="Username">
@@ -159,7 +156,6 @@ section{display:none;padding:40px;}
     <p id="loginMsg"></p>
 </div>
 
-<!-- CLIENT -->
 <div id="clientArea" class="hidden">
 <nav>
     <button onclick="showSection('products')">Products</button>
@@ -172,68 +168,36 @@ section{display:none;padding:40px;}
 
 <label>FM Username</label>
 <input id="deliveryUsername">
-
 <label>FM Password</label>
 <input id="deliveryPassword">
 
 <h3>🪙 Gold Coins</h3>
 <div class="products">
-    <!-- Test Product -->
     <div class="card">
         🪙 TEST COINS
         <div class="price">$0</div>
-        <button class="paypal-btn" onclick="buyProduct('TEST COINS', 0)">Buy</button>
+        <button class="paypal-btn" onclick="buyProduct('TEST COINS',0)">Buy</button>
     </div>
-    <!-- Regular Products -->
     <div class="card">
         🪙 480 000<div class="price">$1</div>
-        <button class="paypal-btn" onclick="buyProduct('480 000 Coins', 1)">Buy</button>
+        <button class="paypal-btn" onclick="buyProduct('480 000 Coins',1)">Buy</button>
     </div>
     <div class="card">
         🪙 1 200 000<div class="price">$2</div>
-        <button class="paypal-btn" onclick="buyProduct('1 200 000 Coins', 2)">Buy</button>
-    </div>
-    <div class="card">
-        🪙 2 400 000<div class="price">$3</div>
-        <button class="paypal-btn" onclick="buyProduct('2 400 000 Coins', 3)">Buy</button>
-    </div>
-    <div class="card">
-        🪙 7 700 000<div class="price">$10</div>
-        <button class="paypal-btn" onclick="buyProduct('7 700 000 Coins', 10)">Buy</button>
-    </div>
-    <div class="card">
-        🪙 20 000 000<div class="price">$20</div>
-        <button class="paypal-btn" onclick="buyProduct('20 000 000 Coins', 20)">Buy</button>
+        <button class="paypal-btn" onclick="buyProduct('1 200 000 Coins',2)">Buy</button>
     </div>
 </div>
 
 <h3>💎 Diamonds</h3>
 <div class="products">
-    <!-- Test Diamond Product -->
     <div class="card">
         💎 TEST DIAMONDS
         <div class="price">$0</div>
-        <button class="paypal-btn" onclick="buyProduct('TEST DIAMONDS', 0)">Buy</button>
+        <button class="paypal-btn" onclick="buyProduct('TEST DIAMONDS',0)">Buy</button>
     </div>
     <div class="card">
         💎 320<div class="price">$1</div>
-        <button class="paypal-btn" onclick="buyProduct('320 Diamonds', 1)">Buy</button>
-    </div>
-    <div class="card">
-        💎 840<div class="price">$2</div>
-        <button class="paypal-btn" onclick="buyProduct('840 Diamonds', 2)">Buy</button>
-    </div>
-    <div class="card">
-        💎 1760<div class="price">$4</div>
-        <button class="paypal-btn" onclick="buyProduct('1760 Diamonds', 4)">Buy</button>
-    </div>
-    <div class="card">
-        💎 4800<div class="price">$10</div>
-        <button class="paypal-btn" onclick="buyProduct('4800 Diamonds', 10)">Buy</button>
-    </div>
-    <div class="card">
-        💎 10 000<div class="price">$20</div>
-        <button class="paypal-btn" onclick="buyProduct('10 000 Diamonds', 20)">Buy</button>
+        <button class="paypal-btn" onclick="buyProduct('320 Diamonds',1)">Buy</button>
     </div>
 </div>
 </section>
@@ -244,19 +208,16 @@ section{display:none;padding:40px;}
 </section>
 </div>
 
-<!-- ADMIN -->
 <div id="adminArea" class="hidden" style="padding:40px;">
 <h2>Admin Dashboard</h2>
 <button onclick="logout()">Logout</button>
 <div id="adminOrders"></div>
 </div>
 
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
-// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyBJsBh6jQW1pD7jgHfQ1iW8OeVFokZBQIk",
   authDomain: "otf-clan-market-4a81c.firebaseapp.com",
@@ -266,47 +227,38 @@ const firebaseConfig = {
   appId: "1:808571362050:web:60907b73a40d4e6b29c01b",
   measurementId: "G-2ETYW40L8K"
 };
-
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-
-// Users and orders collections
 const usersCol = db.collection("users");
 const ordersCol = db.collection("orders");
 
-// Helper functions
 function showSection(id){
     document.querySelectorAll("#clientArea section").forEach(s=>s.classList.remove("active"));
     document.getElementById(id).classList.add("active");
 }
-
 function logout(){location.reload();}
 
-// Register
+// Register user
 async function register(){
     const u = username.value.trim();
     const p = password.value.trim();
     if(!u || !p){ loginMsg.innerText="Fill all fields"; return; }
-
     const doc = await usersCol.doc(u).get();
     if(doc.exists){ loginMsg.innerText="User exists"; return; }
-
-    await usersCol.doc(u).set({password: p});
+    await usersCol.doc(u).set({password:p});
     loginMsg.innerText="Registered successfully";
 }
 
 // Client login
 async function loginClient(){
-    const u = username.value.trim();
-    const p = password.value.trim();
+    const u=username.value.trim(), p=password.value.trim();
     const doc = await usersCol.doc(u).get();
-    if(doc.exists && doc.data().password === p){
+    if(doc.exists && doc.data().password===p){
         loginMsg.innerText="";
         username.value=""; password.value="";
         loginGate.classList.add("hidden");
         clientArea.classList.remove("hidden");
-        clientArea.dataset.user = u;
+        clientArea.dataset.user=u;
         displayClientOrders(u);
     } else { loginMsg.innerText="Invalid login"; }
 }
@@ -322,13 +274,13 @@ function loginAdmin(){
 
 // Reset password
 async function resetPassword(){
-    const u = prompt("Username");
+    const u=prompt("Username");
     if(!u) return;
-    const doc = await usersCol.doc(u).get();
+    const doc=await usersCol.doc(u).get();
     if(!doc.exists){ alert("User not found"); return; }
-    const p = prompt("New password");
+    const p=prompt("New password");
     if(!p) return;
-    await usersCol.doc(u).update({password: p});
+    await usersCol.doc(u).update({password:p});
     alert("Password updated");
 }
 
@@ -338,16 +290,12 @@ async function buyProduct(productName, amount){
     const FMPass = deliveryPassword.value.trim();
     if(!FMUser || !FMPass){ alert("Enter FM Username & Password"); return; }
 
-    // Open PayPal
-    window.open(`https://www.paypal.me/KINGSTONMCKENDIE/${amount}`, "_blank");
-
-    const id = "OTF"+Math.floor(Math.random()*1000000);
+    window.open(`https://www.paypal.me/KINGSTONMCKENDIE/${amount}`,"_blank");
+    const id="OTF"+Math.floor(Math.random()*1000000);
     await ordersCol.doc(id).set({
-        id, user: clientArea.dataset.user || "guest", product: productName,
-        amount, deliveryUsername: FMUser, deliveryPassword: FMPass,
-        status: "Pending"
+        id,user:clientArea.dataset.user,product:productName,amount,
+        deliveryUsername:FMUser,deliveryPassword:FMPass,status:"Pending"
     });
-
     displayClientOrders(clientArea.dataset.user);
     displayAdminOrders();
 }
@@ -374,7 +322,6 @@ async function displayAdminOrders(){
     const snapshot = await ordersCol.get();
     snapshot.forEach(doc=>{
         const o = doc.data();
-        const i = o.id; // using doc id for onchange
         adminOrders.innerHTML+=`
         <div class="order-box">
             User: ${o.user}<br>
@@ -399,5 +346,6 @@ async function changeStatus(id,v){
     displayAdminOrders();
 }
 </script>
+
 </body>
 </html>

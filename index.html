@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OTF Clan Market</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+body{
+    margin:0;
+    font-family:'Roboto',sans-serif;
+    background:#000;
+    color:#fff;
+}
+
+header{
+    padding:20px;
+    text-align:center;
+    font-size:28px;
+    font-weight:700;
+    background:rgba(0,0,0,0.7);
+    box-shadow:0 4px 15px rgba(255,255,255,0.1);
+}
+
+nav{
+    display:flex;
+    justify-content:center;
+    gap:20px;
+    padding:15px;
+    background:rgba(0,0,0,0.6);
+}
+
+button{
+    padding:12px 22px;
+    border:none;
+    border-radius:12px;
+    background:#fff;
+    color:#000;
+    font-weight:500;
+    cursor:pointer;
+    transition:.3s;
+}
+button:hover{ transform:scale(1.05); }
+
+input{
+    width:100%;
+    padding:12px;
+    margin:8px 0;
+    border:none;
+    border-radius:12px;
+    background:rgba(255,255,255,0.1);
+    color:#fff;
+    outline:none;
+}
+
+.hidden{display:none;}
+section{display:none;padding:40px;}
+.active{display:block;}
+
+#loginGate{
+    max-width:400px;
+    margin:60px auto;
+    background:rgba(255,255,255,0.05);
+    padding:40px;
+    border-radius:25px;
+    text-align:center;
+}
+.login-buttons{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    justify-content:center;
+    margin-top:20px;
+}
+#loginMsg{ margin-top:15px; font-size:14px; color:#fff; }
+
+.products{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+}
+
+.card{
+    background:rgba(255,255,255,0.05);
+    padding:25px;
+    border-radius:20px;
+    text-align:center;
+    transition:.3s;
+    color:#fff;
+}
+.card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 12px 30px #fff;
+}
+
+.price{
+    color:#fff;
+    font-size:18px;
+    font-weight:bold;
+}
+
+.order-box{
+    background:rgba(255,255,255,0.05);
+    padding:20px;
+    margin:12px 0;
+    border-radius:15px;
+    color:#fff;
+}
+
+.status{
+    padding:3px 8px;
+    border-radius:8px;
+    font-weight:bold;
+}
+
+/* Status colors for black background */
+.pending{background:#fff;color:#000;}
+.completed{background:#00ff00;color:#000;}
+.cancelled{background:#ff0000;color:#fff;}
+
+/* PayPal button style */
+.paypal-btn{
+    display:inline-block;
+    margin-top:10px;
+    padding:8px 16px;
+    background:#0070ba;
+    color:#fff;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+    text-decoration:none;
+    transition:.3s;
+}
+.paypal-btn:hover{
+    background:#005c99;
+}
+</style>
+</head>
+
+<body>
+
+<header>🔥 OTF Clan Market 🔥</header>
+
+<!-- LOGIN -->
+<div id="loginGate">
+    <h2>Access Required</h2>
+    <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
+
+    <div class="login-buttons">
+        <button onclick="register()">Register</button>
+        <button onclick="loginClient()">Login Client</button>
+        <button onclick="loginAdmin()">Login Admin</button>
+        <button onclick="resetPassword()">Reset Password</button>
+    </div>
+
+    <p id="loginMsg"></p>
+</div>
+
+<!-- CLIENT -->
+<div id="clientArea" class="hidden">
+<nav>
+    <button onclick="showSection('products')">Products</button>
+    <button onclick="showSection('orders')">Orders</button>
+    <button onclick="logout()">Logout</button>
+</nav>
+
+<section id="products" class="active">
+<h2>Market</h2>
+
+<label>Facebook Username</label>
+<input id="deliveryUsername">
+
+<label>Facebook Password</label>
+<input id="deliveryPassword">
+
+<h3>🪙 Gold Coins</h3>
+<div class="products">
+    <!-- Test Product -->
+    <div class="card">
+        🪙 TEST COINS
+        <div class="price">$0</div>
+        <button class="paypal-btn" onclick="buyProduct('TEST COINS', 0)">Buy</button>
+    </div>
+    <!-- Regular Products -->
+    <div class="card">
+        🪙 480 000<div class="price">$1</div>
+        <button class="paypal-btn" onclick="buyProduct('480 000 Coins', 1)">Buy</button>
+    </div>
+    <div class="card">
+        🪙 1 200 000<div class="price">$2</div>
+        <button class="paypal-btn" onclick="buyProduct('1 200 000 Coins', 2)">Buy</button>
+    </div>
+    <div class="card">
+        🪙 2 400 000<div class="price">$3</div>
+        <button class="paypal-btn" onclick="buyProduct('2 400 000 Coins', 3)">Buy</button>
+    </div>
+    <div class="card">
+        🪙 7 700 000<div class="price">$10</div>
+        <button class="paypal-btn" onclick="buyProduct('7 700 000 Coins', 10)">Buy</button>
+    </div>
+    <div class="card">
+        🪙 20 000 000<div class="price">$20</div>
+        <button class="paypal-btn" onclick="buyProduct('20 000 000 Coins', 20)">Buy</button>
+    </div>
+</div>
+
+<h3>💎 Diamonds</h3>
+<div class="products">
+    <!-- Test Diamond Product -->
+    <div class="card">
+        💎 TEST DIAMONDS
+        <div class="price">$0</div>
+        <button class="paypal-btn" onclick="buyProduct('TEST DIAMONDS', 0)">Buy</button>
+    </div>
+    <div class="card">
+        💎 320<div class="price">$1</div>
+        <button class="paypal-btn" onclick="buyProduct('320 Diamonds', 1)">Buy</button>
+    </div>
+    <div class="card">
+        💎 840<div class="price">$2</div>
+        <button class="paypal-btn" onclick="buyProduct('840 Diamonds', 2)">Buy</button>
+    </div>
+    <div class="card">
+        💎 1760<div class="price">$4</div>
+        <button class="paypal-btn" onclick="buyProduct('1760 Diamonds', 4)">Buy</button>
+    </div>
+    <div class="card">
+        💎 4800<div class="price">$10</div>
+        <button class="paypal-btn" onclick="buyProduct('4800 Diamonds', 10)">Buy</button>
+    </div>
+    <div class="card">
+        💎 10 000<div class="price">$20</div>
+        <button class="paypal-btn" onclick="buyProduct('10 000 Diamonds', 20)">Buy</button>
+    </div>
+</div>
+</section>
+
+<section id="orders">
+<h2>Your Orders</h2>
+<div id="clientOrders"></div>
+</section>
+</div>
+
+<!-- ADMIN -->
+<div id="adminArea" class="hidden" style="padding:40px;">
+<h2>Admin Dashboard</h2>
+<button onclick="logout()">Logout</button>
+<div id="adminOrders"></div>
+</div>
+
+<script>
+let users = JSON.parse(localStorage.getItem("users")) || [];
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+function save(){
+    localStorage.setItem("users",JSON.stringify(users));
+    localStorage.setItem("orders",JSON.stringify(orders));
+}
+
+function register(){
+    if(!username.value||!password.value){
+        loginMsg.innerText="Fill all fields";return;
+    }
+    if(users.find(u=>u.u===username.value)){
+        loginMsg.innerText="User exists";return;
+    }
+    users.push({u:username.value,p:password.value});
+    save();
+    loginMsg.innerText="Registered successfully";
+}
+
+function loginClient(){
+    let user=users.find(u=>u.u===username.value && u.p===password.value);
+    if(user){
+        loginMsg.innerText="";
+        username.value="";
+        password.value="";
+        loginGate.classList.add("hidden");
+        clientArea.classList.remove("hidden");
+        clientArea.dataset.user=user.u;
+        displayClientOrders(user.u);
+    }else{
+        loginMsg.innerText="Invalid login";
+    }
+}
+
+function loginAdmin(){
+    if(username.value==="admin" && password.value==="admin123"){
+        loginGate.classList.add("hidden");
+        adminArea.classList.remove("hidden");
+        displayAdminOrders();
+    }else{
+        loginMsg.innerText="Wrong admin login";
+    }
+}
+
+function logout(){location.reload();}
+
+function showSection(id){
+    document.querySelectorAll("#clientArea section").forEach(s=>s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+}
+
+function displayClientOrders(user){
+    clientOrders.innerHTML="";
+    orders.filter(o=>o.user===user).forEach(o=>{
+        clientOrders.innerHTML+=`
+        <div class="order-box">
+            ID: ${o.id}<br>
+            Product: ${o.product}<br>
+            Amount: $${o.amount}<br>
+            Status: <span class="status ${o.status.toLowerCase()}">${o.status}</span>
+        </div>`;
+    });
+}
+
+function displayAdminOrders(){
+    adminOrders.innerHTML="";
+    orders.forEach((o,i)=>{
+        adminOrders.innerHTML+=`
+        <div class="order-box">
+            User: ${o.user}<br>
+            Product: ${o.product}<br>
+            Amount: $${o.amount}<br>
+            Delivery Username: ${o.deliveryUsername}<br>
+            Delivery Password: ${o.deliveryPassword}<br>
+            Status:
+            <select onchange="changeStatus(${i},this.value)">
+                <option ${o.status==="Pending"?"selected":""}>Pending</option>
+                <option ${o.status==="Completed"?"selected":""}>Completed</option>
+                <option ${o.status==="Cancelled"?"selected":""}>Cancelled</option>
+            </select>
+        </div>`;
+    });
+}
+
+function changeStatus(i,v){
+    orders[i].status=v;
+    save();
+    displayAdminOrders();
+    displayClientOrders(clientArea.dataset.user||"");
+}
+
+function resetPassword(){
+    let u=prompt("Username");
+    let user=users.find(x=>x.u===u);
+    if(!user){alert("User not found");return;}
+    let p=prompt("New password");
+    if(!p)return;
+    user.p=p;
+    save();
+    alert("Password updated");
+}
+
+// New function for PayPal purchases with Facebook validation
+function buyProduct(productName, amount){
+    let FacebookUser = document.getElementById("deliveryUsername").value.trim();
+    let FacebookPass = document.getElementById("deliveryPassword").value.trim();
+
+    if(!FacebookUser || !FacebookPass){
+        alert("Please enter your Facebook Username and Password before purchasing!");
+        return;
+    }
+
+    // Open PayPal link in new tab
+    let paypalLink = `https://www.paypal.me/KINGSTONMCKENDIE/${amount}`;
+    window.open(paypalLink, "_blank");
+
+    // Record order
+    let id="OTF"+Math.floor(Math.random()*1000000);
+    orders.push({
+        id,
+        user: clientArea.dataset.user || "guest",
+        product: productName,
+        amount,
+        deliveryUsername: FacebookUser,
+        deliveryPassword: FacebookPass,
+        status: "Pending"
+    });
+    save();
+    displayClientOrders(clientArea.dataset.user || "");
+    displayAdminOrders();
+}
+</script>
+
+</body>
+</html>

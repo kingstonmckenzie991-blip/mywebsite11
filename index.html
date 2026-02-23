@@ -170,10 +170,10 @@ section{display:none;padding:40px;}
 <section id="products" class="active">
 <h2>Market</h2>
 
-<label>Facebook Username</label>
+<label>FM Username</label>
 <input id="deliveryUsername">
 
-<label>Facebook Password</label>
+<label>FM Password</label>
 <input id="deliveryPassword">
 
 <h3>🪙 Gold Coins</h3>
@@ -251,62 +251,113 @@ section{display:none;padding:40px;}
 <div id="adminOrders"></div>
 </div>
 
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
 <script>
-let users = JSON.parse(localStorage.getItem("users")) || [];
-let orders = JSON.parse(localStorage.getItem("orders")) || [];
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyBJsBh6jQW1pD7jgHfQ1iW8OeVFokZBQIk",
+  authDomain: "otf-clan-market-4a81c.firebaseapp.com",
+  projectId: "otf-clan-market-4a81c",
+  storageBucket: "otf-clan-market-4a81c.appspot.com",
+  messagingSenderId: "808571362050",
+  appId: "1:808571362050:web:60907b73a40d4e6b29c01b",
+  measurementId: "G-2ETYW40L8K"
+};
 
-function save(){
-    localStorage.setItem("users",JSON.stringify(users));
-    localStorage.setItem("orders",JSON.stringify(orders));
-}
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-function register(){
-    if(!username.value||!password.value){
-        loginMsg.innerText="Fill all fields";return;
-    }
-    if(users.find(u=>u.u===username.value)){
-        loginMsg.innerText="User exists";return;
-    }
-    users.push({u:username.value,p:password.value});
-    save();
-    loginMsg.innerText="Registered successfully";
-}
+// Users and orders collections
+const usersCol = db.collection("users");
+const ordersCol = db.collection("orders");
 
-function loginClient(){
-    let user=users.find(u=>u.u===username.value && u.p===password.value);
-    if(user){
-        loginMsg.innerText="";
-        username.value="";
-        password.value="";
-        loginGate.classList.add("hidden");
-        clientArea.classList.remove("hidden");
-        clientArea.dataset.user=user.u;
-        displayClientOrders(user.u);
-    }else{
-        loginMsg.innerText="Invalid login";
-    }
-}
-
-function loginAdmin(){
-    if(username.value==="admin" && password.value==="admin123"){
-        loginGate.classList.add("hidden");
-        adminArea.classList.remove("hidden");
-        displayAdminOrders();
-    }else{
-        loginMsg.innerText="Wrong admin login";
-    }
-}
-
-function logout(){location.reload();}
-
+// Helper functions
 function showSection(id){
     document.querySelectorAll("#clientArea section").forEach(s=>s.classList.remove("active"));
     document.getElementById(id).classList.add("active");
 }
 
-function displayClientOrders(user){
+function logout(){location.reload();}
+
+// Register
+async function register(){
+    const u = username.value.trim();
+    const p = password.value.trim();
+    if(!u || !p){ loginMsg.innerText="Fill all fields"; return; }
+
+    const doc = await usersCol.doc(u).get();
+    if(doc.exists){ loginMsg.innerText="User exists"; return; }
+
+    await usersCol.doc(u).set({password: p});
+    loginMsg.innerText="Registered successfully";
+}
+
+// Client login
+async function loginClient(){
+    const u = username.value.trim();
+    const p = password.value.trim();
+    const doc = await usersCol.doc(u).get();
+    if(doc.exists && doc.data().password === p){
+        loginMsg.innerText="";
+        username.value=""; password.value="";
+        loginGate.classList.add("hidden");
+        clientArea.classList.remove("hidden");
+        clientArea.dataset.user = u;
+        displayClientOrders(u);
+    } else { loginMsg.innerText="Invalid login"; }
+}
+
+// Admin login
+function loginAdmin(){
+    if(username.value==="admin" && password.value==="admin123"){
+        loginGate.classList.add("hidden");
+        adminArea.classList.remove("hidden");
+        displayAdminOrders();
+    } else { loginMsg.innerText="Wrong admin login"; }
+}
+
+// Reset password
+async function resetPassword(){
+    const u = prompt("Username");
+    if(!u) return;
+    const doc = await usersCol.doc(u).get();
+    if(!doc.exists){ alert("User not found"); return; }
+    const p = prompt("New password");
+    if(!p) return;
+    await usersCol.doc(u).update({password: p});
+    alert("Password updated");
+}
+
+// Buy product
+async function buyProduct(productName, amount){
+    const FMUser = deliveryUsername.value.trim();
+    const FMPass = deliveryPassword.value.trim();
+    if(!FMUser || !FMPass){ alert("Enter FM Username & Password"); return; }
+
+    // Open PayPal
+    window.open(`https://www.paypal.me/KINGSTONMCKENDIE/${amount}`, "_blank");
+
+    const id = "OTF"+Math.floor(Math.random()*1000000);
+    await ordersCol.doc(id).set({
+        id, user: clientArea.dataset.user || "guest", product: productName,
+        amount, deliveryUsername: FMUser, deliveryPassword: FMPass,
+        status: "Pending"
+    });
+
+    displayClientOrders(clientArea.dataset.user);
+    displayAdminOrders();
+}
+
+// Display client orders
+async function displayClientOrders(user){
     clientOrders.innerHTML="";
-    orders.filter(o=>o.user===user).forEach(o=>{
+    const snapshot = await ordersCol.where("user","==",user).get();
+    snapshot.forEach(doc=>{
+        const o = doc.data();
         clientOrders.innerHTML+=`
         <div class="order-box">
             ID: ${o.id}<br>
@@ -317,9 +368,13 @@ function displayClientOrders(user){
     });
 }
 
-function displayAdminOrders(){
+// Display admin orders
+async function displayAdminOrders(){
     adminOrders.innerHTML="";
-    orders.forEach((o,i)=>{
+    const snapshot = await ordersCol.get();
+    snapshot.forEach(doc=>{
+        const o = doc.data();
+        const i = o.id; // using doc id for onchange
         adminOrders.innerHTML+=`
         <div class="order-box">
             User: ${o.user}<br>
@@ -328,7 +383,7 @@ function displayAdminOrders(){
             Delivery Username: ${o.deliveryUsername}<br>
             Delivery Password: ${o.deliveryPassword}<br>
             Status:
-            <select onchange="changeStatus(${i},this.value)">
+            <select onchange="changeStatus('${doc.id}',this.value)">
                 <option ${o.status==="Pending"?"selected":""}>Pending</option>
                 <option ${o.status==="Completed"?"selected":""}>Completed</option>
                 <option ${o.status==="Cancelled"?"selected":""}>Cancelled</option>
@@ -337,54 +392,12 @@ function displayAdminOrders(){
     });
 }
 
-function changeStatus(i,v){
-    orders[i].status=v;
-    save();
-    displayAdminOrders();
+// Change order status
+async function changeStatus(id,v){
+    await ordersCol.doc(id).update({status:v});
     displayClientOrders(clientArea.dataset.user||"");
-}
-
-function resetPassword(){
-    let u=prompt("Username");
-    let user=users.find(x=>x.u===u);
-    if(!user){alert("User not found");return;}
-    let p=prompt("New password");
-    if(!p)return;
-    user.p=p;
-    save();
-    alert("Password updated");
-}
-
-// New function for PayPal purchases with Facebook validation
-function buyProduct(productName, amount){
-    let FacebookUser = document.getElementById("deliveryUsername").value.trim();
-    let FacebookPass = document.getElementById("deliveryPassword").value.trim();
-
-    if(!FacebookUser || !FacebookPass){
-        alert("Please enter your Facebook Username and Password before purchasing!");
-        return;
-    }
-
-    // Open PayPal link in new tab
-    let paypalLink = `https://www.paypal.me/KINGSTONMCKENDIE/${amount}`;
-    window.open(paypalLink, "_blank");
-
-    // Record order
-    let id="OTF"+Math.floor(Math.random()*1000000);
-    orders.push({
-        id,
-        user: clientArea.dataset.user || "guest",
-        product: productName,
-        amount,
-        deliveryUsername: FacebookUser,
-        deliveryPassword: FacebookPass,
-        status: "Pending"
-    });
-    save();
-    displayClientOrders(clientArea.dataset.user || "");
     displayAdminOrders();
 }
 </script>
-
 </body>
 </html>
